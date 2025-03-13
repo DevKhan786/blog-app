@@ -1,11 +1,9 @@
 import React from "react";
 
 const page = () => {
-  return (
-    <div>
-      <h1>BlogApp</h1>
-    </div>
-  );
+  return <div>
+    blogs
+  </div>;
 };
 
 export default page;
