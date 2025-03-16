@@ -17,7 +17,8 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { auth, provider } from "../firebase";
+import { auth, provider } from "../firebase/firebase";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
@@ -44,13 +45,23 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [minDelayPassed, setMinDelayPassed] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinDelayPassed(true);
+    }, 1000);
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser || null);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, []);
 
   const clearError = () => setError(null);
@@ -60,6 +71,7 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
     setError(null);
     try {
       await signInWithPopup(auth, provider);
+      router.push("/");
     } catch (error: unknown) {
       setError(
         error instanceof Error ? error.message : "Authentication failed"
@@ -74,6 +86,7 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
     setError(null);
     try {
       await signOut(auth);
+      router.push("/");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Logout failed");
     }
@@ -88,13 +101,23 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
     setLoading(true);
     setError(null);
     try {
+      if (
+        isSignup &&
+        email.toLowerCase() ===
+          process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase()
+      ) {
+        setError("This email is reserved. Please use a different email.");
+        setLoading(false);
+        return;
+      }
+
       if (isSignup) {
         await createUserWithEmailAndPassword(auth, email, password);
       } else {
         await signInWithEmailAndPassword(auth, email, password);
+        router.push("/");
       }
     } catch (error: unknown) {
-      // Simple generic error message based on the auth action
       const errorMessage = isSignup
         ? "Signup failed. Please try again."
         : "Login failed. Please check your credentials.";
@@ -109,6 +132,15 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
     setLoading(true);
     setError(null);
     try {
+      if (
+        email.toLowerCase() ===
+        process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase()
+      ) {
+        setError("Password reset is disabled for the demo admin account.");
+        setLoading(false);
+        return Promise.reject(new Error("Admin password reset not allowed"));
+      }
+
       await sendPasswordResetEmail(auth, email);
       return Promise.resolve();
     } catch (error: unknown) {
@@ -124,7 +156,7 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
     <AuthContext.Provider
       value={{
         user,
-        loading,
+        loading: loading || !minDelayPassed,
         error,
         handleSignInWithGoogle,
         handleEmailPasswordAuth,
