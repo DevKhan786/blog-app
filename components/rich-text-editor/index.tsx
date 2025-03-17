@@ -1,4 +1,3 @@
-// components/Editor/TextEditor.tsx
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -20,13 +19,13 @@ const TextEditor: FC<TextEditorProps> = ({ content, onChange }) => {
     editorProps: {
       attributes: {
         class:
-          "min-h-[300px] p-4 border-x border-b rounded-b-lg focus:outline-none prose max-w-none",
+          "min-h-[300px] p-4 border-x border-b border-zinc-700 rounded-b-lg focus:outline-none prose prose-invert max-w-none bg-zinc-900 text-white",
       },
     },
   });
 
   return (
-    <div className="rounded-lg shadow-sm">
+    <div className="rounded-lg shadow-md">
       <MenuBar editor={editor} />
       <EditorContent editor={editor} />
     </div>

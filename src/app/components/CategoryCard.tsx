@@ -29,6 +29,7 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
 
       setIsDeleted(true);
 
+      // Notify parent component
       if (onDelete) {
         onDelete(category.id);
       }
@@ -46,38 +47,38 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
     }
   };
 
+  // If the category has been deleted, show nothing (component will be removed by parent)
   if (isDeleted) {
     return null;
   }
 
   return (
-    <div className="relative bg-white  overflow-hidden rounded-2xl shadow-sm border border-black transition-all hover:shadow-md p-2">
+    <div className="relative bg-zinc-900 rounded-lg overflow-hidden shadow-md border border-zinc-800 transition-all hover:shadow-lg">
+      {/* Delete Confirmation Overlay */}
       {showConfirm && (
         <div className="absolute inset-0 bg-black/80 z-10 flex flex-col items-center justify-center p-4 text-white">
           {loading ? (
             <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-              <p>Deleting...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-400" />
+              <p className="text-indigo-200">Deleting...</p>
             </div>
           ) : (
             <>
               <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-              <h3 className="text-lg font-bold mb-2 uppercase">
-                Delete Category?
-              </h3>
-              <p className="text-sm uppercase text-red-500 font-semibold text-center mb-4">
-                Are you sure you want to delete "{category.name}"?
+              <h3 className="text-lg font-semibold mb-2">Delete Category?</h3>
+              <p className="text-sm text-center mb-4 text-gray-300">
+                Are you sure you want to delete "{category.name}"? This action
+                cannot be undone.
               </p>
-
               <div className="flex gap-3 w-full max-w-xs">
                 <Button
-                  className="flex-1 bg-gray-600 hover:bg-gray-700"
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white"
                   onClick={() => setShowConfirm(false)}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 bg-red-500 hover:bg-red-600"
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                   onClick={handleDelete}
                 >
                   Delete
@@ -88,9 +89,10 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
         </div>
       )}
 
+      {/* Error Message */}
       {error && (
-        <div className="absolute top-2 left-2 right-2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded z-20 flex items-center">
-          <span className="flex-1">{error}</span>
+        <div className="absolute top-2 left-2 right-2 bg-red-900/50 border border-red-700 text-red-200 px-4 py-2 rounded z-20 flex items-center">
+          <span className="flex-1 text-sm">{error}</span>
           <X
             size={16}
             className="cursor-pointer"
@@ -99,7 +101,8 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
         </div>
       )}
 
-      <div className="relative h-48 border border-black rounded-2xl ">
+      {/* Card Content */}
+      <div className="relative h-48">
         <Image
           src={category.imageUrl}
           alt={category.name}
@@ -108,24 +111,28 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
         />
       </div>
       <div className="p-4">
-        <h3 className="font-medium text-lg text-gray-800">{category.name}</h3>
-        <p className="font-light text-xs text-gray-800">
+        <h3 className="font-medium text-lg text-white">{category.name}</h3>
+        <p className="font-light text-xs text-gray-400">
           Slug: {category.slug}
         </p>
         <div className="flex justify-between items-center mt-2">
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-500">
             {category.createdAt
               ? new Date(category.createdAt).toLocaleDateString()
               : "No date"}
           </span>
           <div className="flex gap-2">
             <Link href={`/admin/categories/new/${category.id}`}>
-              <Button className="cursor-pointer" variant="outline" size="sm">
+              <Button
+                className="cursor-pointer hoverEffect"
+                variant="outline"
+                size="sm"
+              >
                 Edit
               </Button>
             </Link>
             <Button
-              className="cursor-pointer bg-white text-red-500 hover:bg-red-50 border border-red-300 hover:border-red-400"
+              className="cursor-pointer bg-red-600 hover:bg-red-700 text-white"
               variant="outline"
               size="sm"
               onClick={() => setShowConfirm(true)}

@@ -52,14 +52,12 @@ const CategoriesPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 sm:p-6">
+    <div className="container mx-auto p-4 sm:p-6 text-white">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-          Categories
-        </h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-white">Categories</h1>
         <Link href="/admin/categories/new" className="w-full sm:w-auto">
-          <Button className="w-full sm:w-auto flex items-center gap-1.5 px-4 py-2.5">
+          <Button className="border-2 border-indigo-600 w-full sm:w-auto flex items-center gap-1.5 px-4 py-2.5 hoverEffect">
             <CirclePlus className="size-4 sm:size-5" />
             <span>Add Category</span>
           </Button>
@@ -68,7 +66,7 @@ const CategoriesPage = () => {
 
       {/* Error State */}
       {error && (
-        <div className="bg-red-50 text-red-700 p-3 sm:p-4 rounded-lg mb-6 text-sm sm:text-base">
+        <div className="bg-red-900/30 border border-red-700 text-red-200 p-3 sm:p-4 rounded-lg mb-6 text-sm sm:text-base">
           {error}
         </div>
       )}
@@ -76,21 +74,24 @@ const CategoriesPage = () => {
       {/* Loading State */}
       {loading ? (
         <div className="flex justify-center items-center py-12 sm:py-20">
-          <p className="text-gray-500 text-sm sm:text-base">
+          <p className="text-gray-400 text-sm sm:text-base">
             Loading categories...
           </p>
         </div>
       ) : /* Empty State */
       categories.length === 0 ? (
-        <div className="text-center py-8 sm:py-16 bg-gray-50 rounded-lg">
-          <h3 className="text-base sm:text-lg font-medium text-gray-600 mb-3">
+        <div className="text-center py-8 sm:py-16 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+          <h3 className="text-base sm:text-lg font-medium text-gray-300 mb-3">
             No categories found
           </h3>
-          <p className="text-gray-500 text-sm sm:text-base mb-4">
+          <p className="text-gray-400 text-sm sm:text-base mb-4">
             Get started by creating your first category
           </p>
-          <Link href="/admin/categories/new">
-            <Button className="px-6 py-3 text-sm sm:text-base">
+          <Link
+            href="/admin/categories/new"
+            className="border border-indigo-600"
+          >
+            <Button className="px-6  py-3 text-sm sm:text-base hoverEffect">
               Create New Category
             </Button>
           </Link>

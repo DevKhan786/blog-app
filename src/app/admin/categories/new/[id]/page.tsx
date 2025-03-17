@@ -143,9 +143,9 @@ const EditCategoryPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="h-16 w-16 animate-spin">
-          <Loader2 />
+      <div className="flex justify-center items-center min-h-screen bg-black">
+        <div className="h-16 w-16 animate-spin text-indigo-500">
+          <Loader2 className="h-full w-full" />
         </div>
       </div>
     );
@@ -153,39 +153,51 @@ const EditCategoryPage = () => {
 
   if (error && !category) {
     return (
-      <div className="container mx-auto p-4">
-        <Alert variant="destructive" className="mb-4">
+      <div className="container mx-auto p-4 bg-black text-white">
+        <Alert
+          variant="destructive"
+          className="mb-4 bg-red-900/30 border border-red-700 text-red-200"
+        >
           <AlertDescription>{error}</AlertDescription>
         </Alert>
         <Link href="/admin/categories">
-          <Button>Back to Categories</Button>
+          <Button className="hoverEffect">Back to Categories</Button>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-full items-center min-h-screen p-4 md:p-6 bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-6 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2 mb-6 text-center text-gray-800">
+    <div className="flex flex-col w-full items-center min-h-screen p-4 md:p-6 bg-black">
+       <Link
+        href="/admin/categories"
+        className=" px-8 hover:bg-indigo-600 duration-300 transition-all bg-red-500 py-2 mb-8 rounded-2xl"
+      >
+        Back
+      </Link>
+      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-lg shadow-md p-6 md:p-8">
+        <h1 className="text-2xl md:text-3xl font-bold mt-2 mb-6 text-center text-white">
           Edit Category
         </h1>
 
         {error && (
-          <Alert variant="destructive" className="mb-6">
+          <Alert
+            variant="destructive"
+            className="mb-6 bg-red-900/30 border border-red-700 text-red-200"
+          >
             <AlertDescription className="text-sm">{error}</AlertDescription>
           </Alert>
         )}
 
         {success && (
-          <Alert className="mb-6 bg-white rounded-2xl text-black border border-green-500">
+          <Alert className="mb-6 bg-indigo-900/30 border border-indigo-700 text-indigo-200">
             <AlertDescription className="text-sm">{success}</AlertDescription>
           </Alert>
         )}
 
         <form onSubmit={updateCategory} className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="name" className="text-sm font-medium text-gray-300">
               Category Name
             </Label>
             <Input
@@ -195,13 +207,13 @@ const EditCategoryPage = () => {
               type="text"
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 focus:ring-2 focus:ring-blue-500 transition-all"
+              className="mt-1 bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:ring-indigo-500"
               required
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="slug" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="slug" className="text-sm font-medium text-gray-300">
               Category Slug
             </Label>
             <Input
@@ -211,10 +223,10 @@ const EditCategoryPage = () => {
               type="text"
               value={formData.slug}
               onChange={handleChange}
-              className="mt-1 focus:ring-2 focus:ring-blue-500 transition-all"
+              className="mt-1 bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:ring-indigo-500"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               Used in URLs, lowercase with hyphens instead of spaces
             </p>
           </div>
@@ -222,7 +234,7 @@ const EditCategoryPage = () => {
           <div className="flex flex-col gap-2">
             <Label
               htmlFor="image"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-300"
             >
               Category Image
             </Label>
@@ -239,8 +251,8 @@ const EditCategoryPage = () => {
 
               {!changeImage && category?.imageUrl ? (
                 <div className="mb-2">
-                  <p className="text-sm text-gray-500 mb-2">Current image:</p>
-                  <div className="relative h-40 w-full bg-gray-100 rounded-md overflow-hidden">
+                  <p className="text-sm text-gray-400 mb-2">Current image:</p>
+                  <div className="relative h-40 w-full bg-zinc-800 rounded-md overflow-hidden">
                     <Image
                       src={category.imageUrl}
                       alt={category.name}
@@ -251,7 +263,7 @@ const EditCategoryPage = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    className="cursor-pointer mt-2 w-full"
+                    className="cursor-pointer mt-2 w-full bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700"
                     onClick={() => setChangeImage(true)}
                   >
                     Change Image
@@ -260,10 +272,10 @@ const EditCategoryPage = () => {
               ) : (
                 <div
                   onClick={triggerFileInput}
-                  className={`relative w-full h-40 sm:h-48 rounded-md overflow-hidden border-2 border-dashed transition-all ${
+                  className={`relative w-full h-40 sm:h-48 rounded-md overflow-hidden border-2 border-dashed transition-all cursor-pointer ${
                     image
-                      ? "border-gray-200 bg-transparent"
-                      : "border-gray-300 bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                      ? "border-indigo-600 bg-transparent"
+                      : "border-zinc-700 bg-zinc-800 hover:border-indigo-500"
                   }`}
                 >
                   {image ? (
@@ -277,19 +289,19 @@ const EditCategoryPage = () => {
                       <button
                         type="button"
                         onClick={removeImage}
-                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500  transition-all cursor-pointer"
+                        className="absolute top-2 right-2 bg-zinc-800 rounded-full p-1 shadow-md hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
                         aria-label="Remove image"
                       >
-                        <X size={16} className="text-gray-700" />
+                        <X size={16} className="text-white" />
                       </button>
-                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2 truncate">
+                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-2 truncate">
                         {image.name}
                       </div>
                     </>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center">
                       <ImagePlus size={32} className="text-gray-400 mb-2" />
-                      <span className="text-gray-500 text-sm">
+                      <span className="text-gray-300 text-sm">
                         Click to select a new image
                       </span>
                       <span className="text-gray-400 text-xs mt-1">
@@ -307,14 +319,14 @@ const EditCategoryPage = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="cursor-pointer w-full"
+                className="cursor-pointer w-full bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700"
               >
                 Cancel
               </Button>
             </Link>
             <Button
               type="submit"
-              className="cursor-pointer flex-1"
+              className="cursor-pointer flex-1 hoverEffect"
               disabled={
                 loading ||
                 !formData.name ||

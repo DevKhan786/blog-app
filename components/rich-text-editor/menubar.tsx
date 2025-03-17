@@ -53,14 +53,14 @@ const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
   ];
 
   return (
-    <div className="flex flex-wrap gap-1 p-2 border rounded-t-lg bg-gray-50">
+    <div className="flex flex-wrap gap-1 p-2 border rounded-t-lg bg-zinc-800 border-zinc-700">
       {formattingOptions.map((option, index) => (
         <Toggle
           key={index}
           size="sm"
           pressed={option.pressed}
           onPressedChange={option.onClick}
-          className="data-[state=on]:bg-gray-200 hover:bg-gray-100"
+          className="data-[state=on]:bg-indigo-600 data-[state=on]:text-white hover:bg-zinc-700 text-white"
           disabled={!editor.isEditable}
         >
           {option.icon}
