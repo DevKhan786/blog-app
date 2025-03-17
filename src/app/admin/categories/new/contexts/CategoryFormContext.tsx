@@ -1,8 +1,9 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Category } from "../../../../../../types/types";
+
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../../../../../lib/firebase/firebase";
+import { Category, CategoryWithId } from "../../../../../../types/types";
 
 interface CategoryFormContextType {
   data: Category;
@@ -29,6 +30,7 @@ export default function CategoryFormProvider({
     name: "",
     slug: "",
     imageUrl: "",
+    createdAt: null,
   });
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -98,6 +100,7 @@ export default function CategoryFormProvider({
         name: "",
         slug: "",
         imageUrl: "",
+        createdAt: null,
       });
       setImage(null);
     } catch (error: unknown) {

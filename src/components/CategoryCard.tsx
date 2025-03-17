@@ -2,11 +2,13 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { CategoryWithId } from "../../../types/types";
+
 import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../../lib/firebase/firebase";
+
 import { useState } from "react";
 import { AlertCircle, Loader2, X } from "lucide-react";
+import { CategoryWithId } from "../../types/types";
+import { db } from "../../lib/firebase/firebase";
 
 interface CategoryCardProps {
   category: CategoryWithId;

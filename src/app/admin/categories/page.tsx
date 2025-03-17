@@ -4,9 +4,10 @@ import { CirclePlus } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import CategoryCard from "../../components/CategoryCard";
+
 import { CategoryWithId } from "../../../../types/types";
 import { db } from "../../../../lib/firebase/firebase";
+import CategoryCard from "@/components/CategoryCard";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState<CategoryWithId[]>([]);

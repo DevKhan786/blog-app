@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import { v4 as uuidv4 } from "uuid";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -12,8 +13,13 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
-    if (!file)
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    if (!file) return new NextResponse("No file provided", { status: 400 });
+
+    if (!file.type.startsWith("image/")) {
+      return new NextResponse("Invalid file type - images only", {
+        status: 400,
+      });
+    }
 
     if (file.size > 5 * 1024 * 1024) {
       return new NextResponse("File size exceeds 5MB limit", { status: 400 });
@@ -23,13 +29,21 @@ export async function POST(request: Request) {
     const base64Image = `data:${file.type};base64,${buffer.toString("base64")}`;
 
     const result = await cloudinary.uploader.upload(base64Image, {
-      folder: "blog/categories",
-      public_id: `category-${Date.now()}`,
+      folder: "blog/posts",
+      public_id: `post-${uuidv4()}`,
+      overwrite: false,
+      resource_type: "auto",
     });
 
-    return NextResponse.json({ imageUrl: result.secure_url });
+    return NextResponse.json({
+      imageUrl: result.secure_url,
+      publicId: result.public_id,
+    });
   } catch (error) {
-    console.error("Upload error:", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    console.error("Cloudinary upload error:", error);
+    return NextResponse.json(
+      { error: "Upload failed. Please try again." },
+      { status: 500 }
+    );
   }
 }

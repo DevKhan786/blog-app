@@ -11,9 +11,9 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
+    const userId = formData.get("userId") as string;
 
-    if (!file)
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
     if (file.size > 5 * 1024 * 1024) {
       return new NextResponse("File size exceeds 5MB limit", { status: 400 });
@@ -23,13 +23,12 @@ export async function POST(request: Request) {
     const base64Image = `data:${file.type};base64,${buffer.toString("base64")}`;
 
     const result = await cloudinary.uploader.upload(base64Image, {
-      folder: "blog/categories",
-      public_id: `category-${Date.now()}`,
+      folder: "blog/profiles",
+      public_id: `profile-${userId}-${Date.now()}`,
     });
 
     return NextResponse.json({ imageUrl: result.secure_url });
   } catch (error) {
-    console.error("Upload error:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

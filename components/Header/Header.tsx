@@ -15,6 +15,7 @@ import { useAuth } from "../../lib/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { BiCategory } from "react-icons/bi";
+import { useUserProfile } from "../../lib/hooks/useUserProfile";
 
 const NavLink = ({
   href,
@@ -44,11 +45,12 @@ const NavLink = ({
 
 const Header = () => {
   const { user, handleLogout } = useAuth();
+  const { profile } = useUserProfile(user);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const hasPhoto = !!user?.photoURL;
-  const hasName = !!user?.displayName;
-  const photoURL = user?.photoURL || "";
+  const hasPhoto = !!profile?.photoURL;
+  const hasName = !!profile?.displayName;
+  const photoURL = profile?.photoURL || "";
 
   return (
     <header className="sticky top-0 z-50 bg-black border-b border-zinc-800">
@@ -112,7 +114,11 @@ const Header = () => {
               <div className="mt-4 border-t border-zinc-800 pt-4">
                 {user ? (
                   <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-2 bg-zinc-900 text-white px-3 py-2 rounded-full border border-zinc-800">
+                    <Link
+                      href="/profile"
+                      onClick={() => setMenuOpen(!menuOpen)}
+                      className="flex items-center gap-2 bg-zinc-900 text-white px-3 py-2 rounded-full border border-zinc-800"
+                    >
                       {hasPhoto ? (
                         <Image
                           className="rounded-full border-2 border-indigo-900"
@@ -128,23 +134,19 @@ const Header = () => {
                       )}
                       <div className="flex flex-col">
                         <h1 className="text-sm font-bold uppercase">
-                          {hasName ? user.displayName : "User"}
+                          {hasName ? profile.displayName : "User"}
                         </h1>
                         <h1 className="text-xs text-gray-400">{user.email}</h1>
                       </div>
-                    </div>
+                    </Link>
                     {user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
-                      <div className="flex">
-                        <Link
-                          href="/admin"
-                          className="flex w-full items-center justify-center gap-2 bg-indigo-600 
-                          px-4 py-2 rounded-lg font-bold transition-all text-white
-                          duration-300 active:scale-90 text-left hover:bg-indigo-700 ease-in-out"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          Admin Panel
-                        </Link>
-                      </div>
+                      <Link
+                        href="/admin"
+                        className="flex w-full items-center justify-center gap-2 bg-indigo-600 px-4 py-2 rounded-lg font-bold transition-all text-white duration-300 active:scale-90 hover:bg-indigo-700 ease-in-out"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Admin Panel
+                      </Link>
                     )}
                     <Button
                       size="lg"
@@ -158,9 +160,7 @@ const Header = () => {
                 ) : (
                   <Link
                     href="/login"
-                    className="flex items-center justify-center gap-2 bg-zinc-900 text-white border border-zinc-800
-                              px-4 py-2 rounded-lg font-semibold transition-all
-                              duration-300 active:scale-90 text-left hover:bg-indigo-600 ease-in-out"
+                    className="flex items-center justify-center gap-2 bg-zinc-900 text-white border border-zinc-800 px-4 py-2 rounded-lg font-semibold transition-all duration-300 active:scale-90 hover:bg-indigo-600 ease-in-out"
                     onClick={() => setMenuOpen(false)}
                   >
                     <LogIn className="w-5 h-5" />
@@ -178,7 +178,10 @@ const Header = () => {
   function renderAuthSection() {
     return user ? (
       <div className="flex gap-4 items-center">
-        <div className="flex items-center gap-2 bg-zinc-900 hover:bg-indigo-600 duration-300 transition-all text-white py-1 px-4 rounded-full active:scale-90 border border-zinc-800">
+        <Link
+          href="/profile"
+          className="flex items-center gap-2 bg-zinc-900 hover:bg-indigo-600 duration-300 transition-all text-white py-1 px-4 rounded-full active:scale-90 border border-zinc-800"
+        >
           {hasPhoto ? (
             <Image
               className="rounded-full border-2 border-indigo-900"
@@ -194,22 +197,18 @@ const Header = () => {
           )}
           <div className="flex flex-col mr-1">
             <h1 className="text-sm font-bold uppercase">
-              {hasName ? user.displayName : "User"}
+              {hasName ? profile.displayName : "User"}
             </h1>
             <h1 className="text-xs text-gray-400">{user.email}</h1>
           </div>
-        </div>
+        </Link>
         {user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
-          <div className="flex">
-            <Link
-              href="/admin"
-              className="flex items-center justify-center gap-2 bg-indigo-600 
-              px-4 py-2 rounded-lg font-bold transition-all text-white
-              duration-300 active:scale-90 text-left hover:bg-indigo-700 ease-in-out"
-            >
-              Admin Panel
-            </Link>
-          </div>
+          <Link
+            href="/admin"
+            className="flex items-center justify-center gap-2 bg-indigo-600 px-4 py-2 rounded-lg font-bold transition-all text-white duration-300 active:scale-90 hover:bg-indigo-700 ease-in-out"
+          >
+            Admin Panel
+          </Link>
         )}
         <Button
           size="lg"
@@ -223,9 +222,7 @@ const Header = () => {
     ) : (
       <Link
         href="/login"
-        className="flex items-center gap-2 bg-zinc-900 text-white border border-zinc-800
-                  px-4 py-2 rounded-lg font-semibold transition-all
-                  duration-300 active:scale-90 text-left hover:bg-indigo-600 ease-in-out"
+        className="flex items-center gap-2 bg-zinc-900 text-white border border-zinc-800 px-4 py-2 rounded-lg font-semibold transition-all duration-300 active:scale-90 hover:bg-indigo-600 ease-in-out"
       >
         <LogIn className="w-5 h-5" />
         Login

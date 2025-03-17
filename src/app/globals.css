@@ -13,6 +13,44 @@
   }
 }
 
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(var(--color-zinc-700)) oklch(var(--color-zinc-900));
+  }
+
+  .scrollbar-custom::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-track {
+    @apply bg-zinc-900;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full hover:bg-zinc-600;
+  }
+}
+
+.prose img {
+  @apply max-w-full h-auto my-4 rounded-lg mx-auto;
+  max-width: min(100%, 400px) !important;
+}
+
+.ProseMirror img {
+  @apply max-w-full h-auto my-2 rounded-lg mx-auto;
+  max-width: min(100%, 300px) !important;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
