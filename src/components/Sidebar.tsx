@@ -28,8 +28,12 @@ export default function Sidebar() {
   return (
     <nav className="w-16 md:w-40 h-screen border-r border-zinc-800 sticky top-0 bg-black">
       <div className="p-3 md:p-4 border-b border-zinc-800">
-        <h2 className="text-xs md:text-sm font-bold text-white hidden md:block">Admin Dashboard</h2>
-        <p className="text-xs text-indigo-400 hidden md:block">Manage your blog</p>
+        <h2 className="text-xs md:text-sm font-bold text-white hidden md:block">
+          Admin Dashboard
+        </h2>
+        <p className="text-xs text-indigo-400 hidden md:block">
+          Manage your blog
+        </p>
       </div>
       <ul className="flex flex-col gap-2 p-2">
         {links.map(({ name, path, icon }) => (
