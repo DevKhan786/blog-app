@@ -6,6 +6,7 @@ import TextEditor from "../../../../components/rich-text-editor";
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../../lib/contexts/AuthContext";
+import { useUserProfile } from "../../../../lib/hooks/useUserProfile";
 
 interface PostFormProps {
   categories: CategoryWithId[];
@@ -39,12 +40,13 @@ const PostForm: React.FC<PostFormProps> = ({
   descriptionMaxLength,
 }) => {
   const [titleCharsLeft, setTitleCharsLeft] = useState(titleMaxLength);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [isDisabled, setIsDisabled] = useState(true);
+  const { profile, loading: profileLoading } = useUserProfile(user);
 
   useEffect(() => {
-    setIsDisabled(!user);
-  }, [user]);
+    setIsDisabled(authLoading || !user);
+  }, [user, authLoading]);
 
   const handleAuthenticatedSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +61,15 @@ const PostForm: React.FC<PostFormProps> = ({
     setTitleCharsLeft(titleMaxLength - postContent.title.length);
   }, [postContent.title, titleMaxLength]);
 
+  if (authLoading || profileLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-10 w-10 animate-spin text-indigo-500 mb-4" />
+        <p className="text-white text-sm">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleAuthenticatedSubmit}
@@ -67,7 +78,9 @@ const PostForm: React.FC<PostFormProps> = ({
       {isDisabled && (
         <div className="absolute inset-0 bg-zinc-900/80 z-10 flex items-center justify-center rounded-lg">
           <p className="text-red-500 font-medium text-sm sm:text-base uppercase">
-            Please login to create posts
+            {authLoading
+              ? "Checking authentication..."
+              : "Please login to create posts"}
           </p>
         </div>
       )}

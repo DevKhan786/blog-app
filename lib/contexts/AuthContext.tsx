@@ -52,9 +52,10 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinDelayPassed(true);
-    }, 2000);
+    }, 1000);
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setLoading(true);
       if (currentUser) {
         await createUserProfile(currentUser);
       }
@@ -98,14 +99,23 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
         photoURL: user.photoURL || "",
         createdAt: new Date().toISOString(),
         provider: user.providerData[0]?.providerId || "password",
+        favoritePostIds: [],
+        updatedAt: new Date().toISOString(),
       });
     } else {
-      await updateDoc(userRef, {
+      const updates: any = {
         email: user.email,
         displayName: user.displayName || userSnapshot.data().displayName,
         photoURL: user.photoURL || userSnapshot.data().photoURL,
         lastLogin: new Date().toISOString(),
-      });
+        updatedAt: new Date().toISOString(),
+      };
+
+      if (!userSnapshot.data().favoritePostIds) {
+        updates.favoritePostIds = [];
+      }
+
+      await updateDoc(userRef, updates);
     }
   };
 

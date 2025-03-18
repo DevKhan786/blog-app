@@ -9,6 +9,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../lib/contexts/AuthContext";
@@ -22,8 +23,8 @@ const TITLE_MAX_LENGTH = 20;
 const DESCRIPTION_MAX_LENGTH = 100;
 
 const BlogsPage = () => {
-  const { user } = useAuth();
-  const { profile } = useUserProfile(user);
+  const { user, loading: authLoading } = useAuth();
+  const { profile, loading: profileLoading } = useUserProfile(user);
   const [postContent, setPostContent] = useState({
     title: "",
     description: "",
@@ -32,18 +33,90 @@ const BlogsPage = () => {
   });
   const [categories, setCategories] = useState<CategoryWithId[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<Posts[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchCategories();
-    fetchPosts();
-  }, []);
+    let isMounted = true;
+
+    const loadData = async () => {
+      try {
+        setDataLoading(true);
+        setError(null);
+
+        const [categoriesData] = await Promise.all([fetchCategories()]);
+        if (isMounted) setCategories(categoriesData);
+
+        const postsRef = collection(db, "posts");
+        const unsubscribePosts = onSnapshot(
+          postsRef,
+          (snapshot) => {
+            if (!isMounted) return;
+
+            const postsList = snapshot.docs
+              .map((doc) => {
+                const data = doc.data();
+                return {
+                  id: doc.id,
+                  title: data.title || "",
+                  description: data.description || "",
+                  categoryId: data.categoryId || "",
+                  categoryName: data.categoryName || "",
+                  categorySlug: data.categorySlug || "",
+                  authorId: data.authorId || "",
+                  authorName: data.authorName || "Anonymous",
+                  authorEmail: data.authorEmail || null,
+                  authorPhotoURL: data.authorPhotoURL || null,
+                  createdAt: data.createdAt || new Date().toISOString(),
+                  updatedAt: data.updatedAt || new Date().toISOString(),
+                  published: data.published || false,
+                  imagePublicId: data.imagePublicId || "",
+                  likeCount: data.likeCount || 0,
+                  likedBy: data.likedBy || [],
+                  dislikedBy: data.dislikedBy || [],
+                  favoritedBy: data.favoritedBy || [],
+                } as Posts;
+              })
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              );
+            if (isMounted) setPosts(postsList);
+          },
+          (error) => {
+            if (isMounted) {
+              setError("Failed to load posts in real-time");
+              toast.error("Failed to load posts");
+              console.error("Realtime error:", error);
+            }
+          }
+        );
+
+        return () => {
+          unsubscribePosts();
+          isMounted = false;
+        };
+      } catch (error) {
+        if (isMounted) {
+          setError("Failed to load initial data");
+          console.error("Initial load error:", error);
+        }
+      } finally {
+        if (isMounted) setDataLoading(false);
+      }
+    };
+
+    if (!authLoading) loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authLoading]);
 
   const fetchCategories = async () => {
-    setError(null);
     try {
       const categorySnapshot = await getDocs(collection(db, "categories"));
       const categoryList = categorySnapshot.docs.map((doc) => ({
@@ -53,51 +126,14 @@ const BlogsPage = () => {
         imageUrl: doc.data().imageUrl || "",
         createdAt: doc.data().createdAt || new Date().toISOString(),
       }));
-      categoryList.sort(
+      return categoryList.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-      setCategories(categoryList);
     } catch (error) {
       setError("Failed to load categories");
       toast.error("Failed to load categories");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchPosts = async () => {
-    setError(null);
-    try {
-      const postSnapshot = await getDocs(collection(db, "posts"));
-      const postsList = postSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          title: data.title || "",
-          description: data.description || "",
-          categoryId: data.categoryId || "",
-          categoryName: data.categoryName || "",
-          categorySlug: data.categorySlug || "",
-          authorId: data.authorId || "",
-          authorName: data.authorName || "Anonymous",
-          authorEmail: data.authorEmail || null,
-          authorPhotoURL: data.authorPhotoURL || null,
-          createdAt: data.createdAt || new Date().toISOString(),
-          updatedAt: data.updatedAt || new Date().toISOString(),
-          published: data.published || false,
-          imagePublicId: data.imagePublicId || "",
-        } as Posts;
-      });
-
-      postsList.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      setPosts(postsList);
-    } catch (error) {
-      setError("Failed to load posts");
-      toast.error("Failed to load posts");
+      return [];
     }
   };
 
@@ -134,7 +170,7 @@ const BlogsPage = () => {
       }
 
       toast.success("Post deleted successfully");
-      fetchPosts();
+      // Rely on onSnapshot to update the posts list
     } catch (error) {
       console.error("Delete error:", error);
       toast.error("Failed to delete post");
@@ -168,18 +204,30 @@ const BlogsPage = () => {
 
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, "posts"), {
-        ...postContent,
+      const category = categories.find((c) => c.id === postContent.categoryId);
+
+      const newPostData = {
         title: postContent.title.trim(),
-        categoryName:
-          categories.find((c) => c.id === postContent.categoryId)?.name || "",
+        description: postContent.description,
+        categoryId: postContent.categoryId,
+        categoryName: category?.name || "",
+        categorySlug: category?.slug || "",
         authorId: user.uid,
         authorName: profile.displayName || user.email?.split("@")[0] || "User",
+        authorEmail: user.email || null,
         authorPhotoURL: profile.photoURL || null,
         createdAt: new Date().toISOString(),
-        imagePublicId: postContent.imagePublicId,
-      });
-      await fetchPosts();
+        updatedAt: new Date().toISOString(),
+        published: true,
+        imagePublicId: postContent.imagePublicId || "",
+        likeCount: 0,
+        likedBy: [],
+        dislikedBy: [],
+        favoritedBy: [],
+      };
+
+      await addDoc(collection(db, "posts"), newPostData);
+
       resetForm();
       toast.success("Post created successfully!");
     } catch (error) {
@@ -202,7 +250,7 @@ const BlogsPage = () => {
     }, 10);
   };
 
-  if (isLoading) {
+  if (authLoading || dataLoading || profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-500 mb-4" />
@@ -225,7 +273,7 @@ const BlogsPage = () => {
       <div className="border-b border-zinc-800 my-3" />
       <PostList
         posts={posts}
-        isLoading={isLoading}
+        isLoading={!!deletingId}
         error={error}
         onDelete={handleDelete}
         deletingId={deletingId}

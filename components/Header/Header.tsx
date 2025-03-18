@@ -9,6 +9,7 @@ import {
   Newspaper,
   User,
   X,
+  Bookmark,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "../../lib/contexts/AuthContext";
@@ -111,6 +112,16 @@ const Header = () => {
                 Categories
               </NavLink>
 
+              {user && (
+                <NavLink
+                  href="/profile?tab=favorites"
+                  icon={Bookmark}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Favorites
+                </NavLink>
+              )}
+
               <div className="mt-4 border-t border-zinc-800 pt-4">
                 {user ? (
                   <div className="flex flex-col gap-4">
@@ -178,6 +189,14 @@ const Header = () => {
   function renderAuthSection() {
     return user ? (
       <div className="flex gap-4 items-center">
+        <Link
+          href="/profile?tab=favorites"
+          className="flex items-center justify-center bg-zinc-900 hover:bg-indigo-600 duration-300 transition-all text-white p-2 rounded-full active:scale-90 border border-zinc-800"
+          aria-label="Favorites"
+        >
+          <Bookmark className="w-5 h-5 text-indigo-400" />
+        </Link>
+
         <Link
           href="/profile"
           className="flex items-center gap-2 bg-zinc-900 hover:bg-indigo-600 duration-300 transition-all text-white py-1 px-4 rounded-full active:scale-90 border border-zinc-800"

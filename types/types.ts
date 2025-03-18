@@ -27,5 +27,19 @@ export interface Posts {
   createdAt: string;
   updatedAt: string;
   published: boolean;
-  imagePublicId?: string; 
+  imagePublicId?: string;
+  likeCount: number;
+  likedBy: string[];
+  dislikedBy: string[];
+  favoritedBy: string[];
+}
+
+export interface UserProfile {
+  uid: string;
+  displayName: string;
+  email: string;
+  photoURL: string | null;
+  createdAt: string;
+  updatedAt: string;
+  favoritePostIds: string[];
 }
