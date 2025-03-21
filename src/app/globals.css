@@ -16,7 +16,22 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: var(--font-body);
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -52,6 +67,9 @@
 }
 
 :root {
+  --font-heading: var(--poppins-font);
+  --font-display: var(--orbitron-font);
+  --font-body: var(--inter-font);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.147 0.004 49.25);

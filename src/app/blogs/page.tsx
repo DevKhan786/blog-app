@@ -18,6 +18,7 @@ import { db } from "../../../lib/firebase/firebase";
 import PostForm from "./components/PostForm";
 import PostList from "./components/PostList";
 import { useUserProfile } from "../../../lib/hooks/useUserProfile";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const TITLE_MAX_LENGTH = 20;
 const DESCRIPTION_MAX_LENGTH = 100;
@@ -37,6 +38,9 @@ const BlogsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<Posts[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const selectedCategory = searchParams.get("category");
+  const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
@@ -46,7 +50,7 @@ const BlogsPage = () => {
         setDataLoading(true);
         setError(null);
 
-        const [categoriesData] = await Promise.all([fetchCategories()]);
+        const categoriesData = await fetchCategories();
         if (isMounted) setCategories(categoriesData);
 
         const postsRef = collection(db, "posts");
@@ -84,7 +88,14 @@ const BlogsPage = () => {
                   new Date(b.createdAt).getTime() -
                   new Date(a.createdAt).getTime()
               );
-            if (isMounted) setPosts(postsList);
+
+            const filteredPosts = selectedCategory
+              ? postsList.filter(
+                  (post) => post.categorySlug === selectedCategory
+                )
+              : postsList;
+
+            if (isMounted) setPosts(filteredPosts);
           },
           (error) => {
             if (isMounted) {
@@ -114,7 +125,7 @@ const BlogsPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [authLoading]);
+  }, [authLoading, selectedCategory]);
 
   const fetchCategories = async () => {
     try {
@@ -170,7 +181,6 @@ const BlogsPage = () => {
       }
 
       toast.success("Post deleted successfully");
-      // Rely on onSnapshot to update the posts list
     } catch (error) {
       console.error("Delete error:", error);
       toast.error("Failed to delete post");
@@ -271,6 +281,16 @@ const BlogsPage = () => {
         descriptionMaxLength={DESCRIPTION_MAX_LENGTH}
       />
       <div className="border-b border-zinc-800 my-3" />
+      <div className="flex justify-center mb-6">
+        {selectedCategory && (
+          <button
+            onClick={() => router.push("/categories")}
+            className="px-4 py-2 bg-red-500 capitalize cursor-pointer text-white rounded-lg transition-colors"
+          >
+            {selectedCategory && `${selectedCategory}`} - Clear Filter
+          </button>
+        )}
+      </div>
       <PostList
         posts={posts}
         isLoading={!!deletingId}

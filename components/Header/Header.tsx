@@ -54,7 +54,7 @@ const Header = () => {
   const photoURL = profile?.photoURL || "";
 
   return (
-    <header className="sticky top-0 z-50 bg-black border-b border-zinc-800">
+    <header className="sticky top-0 z-100 bg-black border-b border-zinc-800">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between relative">
         <Link
           href="/"
@@ -83,7 +83,7 @@ const Header = () => {
             Home
           </NavLink>
           <NavLink href="/blogs" icon={Layers}>
-            Blogs
+            Posts
           </NavLink>
           <NavLink href="/categories" icon={BiCategory}>
             Categories
@@ -102,7 +102,7 @@ const Header = () => {
                 icon={Newspaper}
                 onClick={() => setMenuOpen(false)}
               >
-                Blogs
+                Posts
               </NavLink>
               <NavLink
                 href="/categories"

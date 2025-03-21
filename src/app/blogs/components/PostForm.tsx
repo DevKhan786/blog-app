@@ -73,14 +73,12 @@ const PostForm: React.FC<PostFormProps> = ({
   return (
     <form
       onSubmit={handleAuthenticatedSubmit}
-      className="bg-black rounded-lg shadow-lg relative"
+      className="bg-black rounded-lg shadow-lg relative mt-5"
     >
       {isDisabled && (
-        <div className="absolute inset-0 bg-zinc-900/80 z-10 flex items-center justify-center rounded-lg">
+        <div className="absolute inset-0 bg-black border-4 z-10 flex items-center justify-center rounded-lg">
           <p className="text-red-500 font-medium text-sm sm:text-base uppercase">
-            {authLoading
-              ? "Checking authentication..."
-              : "Please login to create posts"}
+            {authLoading ? null : "Please login to create posts"}
           </p>
         </div>
       )}

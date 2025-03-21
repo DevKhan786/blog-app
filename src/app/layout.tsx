@@ -4,14 +4,36 @@ import "./globals.css";
 import GlobalLoading from "../../components/GlobalLoading";
 import { Toaster } from "react-hot-toast";
 
+import { Poppins, Orbitron, Inter } from "next/font/google";
+
+const poppins = Poppins({
+  weight: ["600", "700", "800"],
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const orbitron = Orbitron({
+  weight: ["500", "700"],
+  subsets: ["latin"],
+  variable: "--font-display",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-black text-white scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 scrollbar-thumb-rounded">
+    <html
+      lang="en"
+      className={`${poppins.variable} ${orbitron.variable} ${inter.variable}`}
+    >
+      <body className="bg-gradient-to-br from-black via-indigo-700 to-black text-white scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 scrollbar-thumb-rounded">
         <AuthContextProvider>
           <Toaster
             position="bottom-center"
@@ -56,6 +78,9 @@ export default function RootLayout({
           />
           <GlobalLoading />
           <Header />
+          <div className="min-h-screen h-full fixed inset-0 opacity-10 -z-10">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,gray_1px,transparent_1px),linear-gradient(to_bottom,gray_1px,transparent_1px)] bg-[size:24px_24px]" />
+          </div>
           {children}
         </AuthContextProvider>
       </body>
