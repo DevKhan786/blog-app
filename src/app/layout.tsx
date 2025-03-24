@@ -3,8 +3,8 @@ import Header from "../../components/Header/Header";
 import "./globals.css";
 import GlobalLoading from "../../components/GlobalLoading";
 import { Toaster } from "react-hot-toast";
-
 import { Poppins, Orbitron, Inter } from "next/font/google";
+import { ScrollToTop } from "../../components/ScrollToTop";
 
 const poppins = Poppins({
   weight: ["600", "700", "800"],
@@ -35,6 +35,7 @@ export default function RootLayout({
     >
       <body className="bg-gradient-to-br from-black via-indigo-700 to-black text-white scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 scrollbar-thumb-rounded">
         <AuthContextProvider>
+          <ScrollToTop />
           <Toaster
             position="bottom-center"
             toastOptions={{

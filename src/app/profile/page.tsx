@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { doc, updateDoc, onSnapshot } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { User, Loader2 } from "lucide-react";
@@ -23,6 +23,15 @@ export default function ProfilePage() {
   const [inputKey, setInputKey] = useState(Date.now());
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "favorites") {
+      setActiveTab("favorites");
+    } else {
+      setActiveTab("profile");
+    }
+  }, [searchParams]);
 
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") === "favorites" ? "favorites" : "profile"
@@ -203,8 +212,7 @@ export default function ProfilePage() {
               disabled={uploading}
             />
             <Button
-              variant="outline"
-              className="cursor-pointer absolute bottom-0 right-0 rounded-full p-2 h-10 w-10"
+              className="cursor-pointer bg-white text-black hover:bg-indigo-600 hover:text-white absolute bottom-0 right-0 rounded-full p-2 h-10 w-10"
               onClick={() => document.getElementById("avatar-upload")?.click()}
               disabled={uploading}
               aria-label="Change profile picture"
