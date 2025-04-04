@@ -14,6 +14,7 @@ interface PostItemProps {
 
 const PostItem: React.FC<PostItemProps> = ({ post, onDelete, isDeleting }) => {
   const { user } = useAuth();
+  const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   return (
     <div className="bg-black rounded-lg border border-zinc-800 p-2 sm:p-3 shadow-lg hover:border-zinc-600 transition-colors">
@@ -58,14 +59,17 @@ const PostItem: React.FC<PostItemProps> = ({ post, onDelete, isDeleting }) => {
             </div>
 
             <div className="flex items-center gap-1 flex-shrink-0">
-              <VoteButtons postId={post.id} className="scale-90 sm:scale-100" />
+              <VoteButtons
+                postId={post.id}
+                className=" scale-90 sm:scale-100"
+              />
               {user?.uid === post.authorId && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => onDelete(post.id)}
                   disabled={isDeleting}
-                  className="h-6 w-6 p-0 xs:h-7 xs:w-7 text-zinc-400 hover:bg-zinc-800 hover:text-red-500 transition-colors duration-300"
+                  className="cursor-pointer h-6 w-6 p-0 xs:h-7 xs:w-7 text-zinc-400 hover:bg-zinc-800 hover:text-red-500 transition-colors duration-300"
                 >
                   <Trash className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
                   <span className="sr-only">Delete post</span>

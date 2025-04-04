@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase-admin/firestore";
+
 export interface CategoryWithId {
   id: string;
   name: string;
@@ -43,3 +45,21 @@ export interface UserProfile {
   updatedAt: string;
   favoritePostIds: string[];
 }
+
+export interface UserProfileWithPostCount extends UserProfile {
+  postCount: number; 
+}
+
+export type AnalyticsData = {
+  id: string;
+  event: string;
+  data: {
+    path: string;
+    country: string;
+    region: string;
+    city: string;
+    ip: string;
+    userAgent: string;
+  };
+  timestamp: Timestamp;
+};

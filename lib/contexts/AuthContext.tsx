@@ -52,7 +52,7 @@ export default function AuthContextProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinDelayPassed(true);
-    }, 1000);
+    }, 200);
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setLoading(true);

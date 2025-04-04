@@ -33,7 +33,7 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({
         size="sm"
         onClick={toggleLike}
         disabled={isProcessing}
-        className={`h-6 w-6 p-0 xs:h-7 xs:w-7 ${
+        className={`cursor-pointer h-6 w-6 p-0 xs:h-7 xs:w-7 ${
           isLiked
             ? "text-green-500 bg-green-500/10"
             : "text-zinc-400 hover:bg-zinc-800"
@@ -62,7 +62,7 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({
         size="sm"
         onClick={toggleDislike}
         disabled={isProcessing}
-        className={`h-6 w-6 p-0 xs:h-7 xs:w-7 ${
+        className={`cursor-pointer h-6 w-6 p-0 xs:h-7 xs:w-7 ${
           isDisliked
             ? "text-red-500 bg-red-500/10"
             : "text-zinc-400 hover:bg-zinc-800"
@@ -82,7 +82,7 @@ const VoteButtons: React.FC<VoteButtonsProps> = ({
           size="sm"
           onClick={toggleFavorite}
           disabled={isProcessing}
-          className={`h-6 w-6 p-0 xs:h-7 xs:w-7 ${
+          className={`cursor-pointer h-6 w-6 p-0 xs:h-7 xs:w-7 ${
             isFavorited
               ? "text-indigo-500 bg-indigo-500/10"
               : "text-zinc-400 hover:bg-zinc-800"

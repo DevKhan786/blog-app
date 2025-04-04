@@ -31,7 +31,6 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
 
       setIsDeleted(true);
 
-      // Notify parent component
       if (onDelete) {
         onDelete(category.id);
       }
@@ -49,14 +48,12 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
     }
   };
 
-  // If the category has been deleted, show nothing (component will be removed by parent)
   if (isDeleted) {
     return null;
   }
 
   return (
     <div className="relative bg-zinc-900 rounded-lg overflow-hidden shadow-md border border-zinc-800 transition-all hover:shadow-lg">
-      {/* Delete Confirmation Overlay */}
       {showConfirm && (
         <div className="absolute inset-0 bg-black/80 z-10 flex flex-col items-center justify-center p-4 text-white">
           {loading ? (
@@ -91,7 +88,6 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
         </div>
       )}
 
-      {/* Error Message */}
       {error && (
         <div className="absolute top-2 left-2 right-2 bg-red-900/50 border border-red-700 text-red-200 px-4 py-2 rounded z-20 flex items-center">
           <span className="flex-1 text-sm">{error}</span>
@@ -103,7 +99,6 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
         </div>
       )}
 
-      {/* Card Content */}
       <div className="relative h-48">
         <Image
           src={category.imageUrl}

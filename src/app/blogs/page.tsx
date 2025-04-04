@@ -165,21 +165,14 @@ const BlogsPage = () => {
       }
 
       const postData = postSnap.data();
-      if (postData.authorId !== user.uid) {
-        toast.error("You can only delete your own posts");
+      const isAdmin = user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
+      if (postData.authorId !== user.uid && !isAdmin) {
+        toast.error("You don't have permission to delete this post");
         return;
       }
 
       await deleteDoc(postRef);
-
-      if (postData.imagePublicId) {
-        await fetch("/api/delete-image", {
-          method: "POST",
-          body: JSON.stringify({ publicId: postData.imagePublicId }),
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-
       toast.success("Post deleted successfully");
     } catch (error) {
       console.error("Delete error:", error);

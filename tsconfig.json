@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["firebase-admin/app", "firebase-admin/firestore"],
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

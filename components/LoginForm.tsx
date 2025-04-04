@@ -31,6 +31,9 @@ const LoginForm = () => {
   useEffect(() => {
     if (user) {
       router.push("/");
+    } else {
+      clearError();
+      setValidationErrors({});
     }
   }, [user, router]);
 
@@ -92,6 +95,7 @@ const LoginForm = () => {
   };
 
   const fillAdminCredentials = () => {
+    setValidationErrors({});
     setEmail("test123@gmail.com");
     setPassword("test123");
     setIsNewUser(false);
@@ -120,7 +124,6 @@ const LoginForm = () => {
         </div>
       )}
 
-      {/* Admin Credentials Box */}
       <div className="p-3 bg-zinc-800 border border-dashed border-zinc-600 rounded-md">
         <h3 className="text-xs sm:text-sm font-medium text-indigo-300 mb-1">
           Admin Test Credentials:

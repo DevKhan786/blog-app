@@ -9,11 +9,6 @@ export default function Sidebar() {
       icon: <Gauge className="w-4 h-4 md:w-6 md:h-6 text-indigo-400" />,
     },
     {
-      name: "Posts",
-      path: "/admin/posts",
-      icon: <LayoutList className="w-4 h-4 md:w-6 md:h-6 text-indigo-400" />,
-    },
-    {
       name: "Categories",
       path: "/admin/categories",
       icon: <Layers2 className="w-4 h-4 md:w-6 md:h-6 text-indigo-400" />,
