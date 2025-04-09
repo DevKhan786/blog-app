@@ -11,6 +11,7 @@
 !.yarn/versions
 /config
 /config/firebase-service-account.json
+firebase-service-account.json
 # testing
 /coverage
 .env
