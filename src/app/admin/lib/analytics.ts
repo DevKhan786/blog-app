@@ -18,9 +18,11 @@ export async function getUniqueVisitors(days: number = 30): Promise<number> {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
 
+  const cutoffTimestamp = Timestamp.fromDate(cutoffDate);
+
   const snapshot = await adminDb
     .collection("analytics")
-    .where("timestamp", ">=", cutoffDate)
+    .where("timestamp", ">=", cutoffTimestamp)
     .select("visitorId")
     .get();
 

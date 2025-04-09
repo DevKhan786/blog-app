@@ -16,6 +16,9 @@ import {
 } from "./lib/analytics";
 import { DashboardCard } from "@/components/DashboardCard";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Dashboard() {
   const [totalViews, uniqueVisitors, popularPages, viewsByCountry] =
     await Promise.all([
