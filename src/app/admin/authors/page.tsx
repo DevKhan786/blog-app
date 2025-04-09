@@ -1,5 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Trash2, User } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -165,27 +171,26 @@ const AuthorsPage = () => {
                   </div>
 
                   <div className="mt-4 flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDeleteUser(author.uid, author.email)}
-                      disabled={
-                        deletingId === author.uid ||
-                        author.uid === currentUser?.uid ||
-                        author.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-                      }
-                      className="cursor-pointer text-xs h-8 px-3"
-                    >
-                      {deletingId === author.uid ? (
-                        "Deleting..."
-                      ) : (
-                        <>
-                          <Trash2 className="w-3 h-3 mr-1.5" />
-                          Delete
-                        </>
-                      )}
-                    </Button>
-
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="inline-block">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            disabled
+                            className="cursor-not-allowed opacity-50 text-xs h-8 px-3"
+                          >
+                            <Trash2 className="w-3 h-3 mr-1.5" />
+                            Delete
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className=" border-zinc-700">
+                        <p className="text-sm text-zinc-200">
+                          Deletion disabled in demo.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
                     <span className="text-xs text-zinc-500">
                       {author.postCount || 0} posts
                     </span>
