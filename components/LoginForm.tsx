@@ -35,7 +35,7 @@ const LoginForm = () => {
       clearError();
       setValidationErrors({});
     }
-  }, [user, router]);
+  }, [user]);
 
   const validateForm = () => {
     const errors: { email?: string; password?: string } = {};
@@ -101,6 +101,10 @@ const LoginForm = () => {
     setIsNewUser(false);
     setShowResetPassword(false);
   };
+
+  if (user) {
+    return <div></div>;
+  }
 
   return (
     <div className="mx-auto w-[90%] sm:w-[85%] md:w-[70%] lg:max-w-md p-3 sm:p-5 space-y-3 sm:space-y-5 bg-zinc-900 rounded-lg shadow-md border border-zinc-700">
