@@ -1,20 +1,28 @@
-import { test as setup } from "@playwright/test";
+import { chromium } from "@playwright/test";
+import path from "path";
+import dotenv from "dotenv";
 
-const authFile = "tests/e2e/.auth/user.json";
+dotenv.config({ path: path.resolve(__dirname, "../../.env.test") });
 
-setup.describe("Auth Setup", () => {
-  setup("authenticate", async ({ page }) => {
-    await page.goto("/login");
+async function globalSetup() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
 
-    await page.getByLabel(/email/i).fill(process.env.TEST_USER_EMAIL as string);
-    await page
-      .getByLabel(/password/i)
-      .fill(process.env.TEST_USER_PASSWORD as string);
+  try {
+    await page.goto(`${process.env.BASE_URL}/login`);
 
-    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.getByLabel("Email").fill(process.env.TEST_USER_EMAIL!);
+    await page.getByLabel("Password").fill(process.env.TEST_USER_PASSWORD!);
+    await page.getByRole("button", { name: "Sign In" }).click();
 
-    await page.waitForURL("/");
+    await page.waitForURL(`${process.env.BASE_URL}/`);
 
-    await page.context().storageState({ path: authFile });
-  });
-});
+    await page.context().storageState({
+      path: path.resolve(__dirname, "../../tests/e2e/.auth/user.json"),
+    });
+  } finally {
+    await browser.close();
+  }
+}
+
+export default globalSetup;

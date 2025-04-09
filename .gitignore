@@ -18,7 +18,9 @@
 # next.js
 /.next/
 /out/
-
+/config/firebase-service-account.json
+*.env*
+.env.test
 # production
 /build
 
