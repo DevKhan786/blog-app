@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -13,7 +13,29 @@ import { updateProfile } from "firebase/auth";
 import toast from "react-hot-toast";
 import VoteButtons from "../../../components/VoteButtons";
 
+// Parent component handling suspense
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={<ProfileLoadingSkeleton />}>
+      <ProfileContent />
+    </Suspense>
+  );
+}
+
+// Loading skeleton component
+function ProfileLoadingSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto p-4 min-h-screen">
+      <div className="animate-pulse flex flex-col items-center gap-6">
+        <div className="rounded-full bg-zinc-800 w-32 h-32" />
+        <div className="h-8 bg-zinc-800 rounded w-64" />
+      </div>
+    </div>
+  );
+}
+
+// Main content component with search params
+function ProfileContent() {
   const { user } = useAuth();
   const { profile, loading: profileLoading } = useUserProfile(user);
   const { favorites, loading: favoritesLoading, error } = useFavorites();
@@ -24,18 +46,16 @@ export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // State derived from search params
+  const [activeTab, setActiveTab] = useState<"profile" | "favorites">(() => {
+    return searchParams.get("tab") === "favorites" ? "favorites" : "profile";
+  });
+
+  // Sync tab state with URL params
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab === "favorites") {
-      setActiveTab("favorites");
-    } else {
-      setActiveTab("profile");
-    }
+    setActiveTab(tab === "favorites" ? "favorites" : "profile");
   }, [searchParams]);
-
-  const [activeTab, setActiveTab] = useState(
-    searchParams.get("tab") === "favorites" ? "favorites" : "profile"
-  );
 
   useEffect(() => {
     if (!user) {
@@ -127,31 +147,24 @@ export default function ProfilePage() {
     }
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    const url = new URL(window.location.href);
+  const handleTabChange = (tab: "profile" | "favorites") => {
+    const params = new URLSearchParams(searchParams);
     if (tab === "favorites") {
-      url.searchParams.set("tab", "favorites");
+      params.set("tab", "favorites");
     } else {
-      url.searchParams.delete("tab");
+      params.delete("tab");
     }
-    window.history.pushState({}, "", url.toString());
+    router.replace(`?${params.toString()}`);
+    setActiveTab(tab);
   };
 
   if (profileLoading) {
-    return (
-      <div className="max-w-3xl mx-auto p-4 min-h-screen">
-        <div className="animate-pulse flex flex-col items-center gap-6">
-          <div className="rounded-full bg-zinc-800 w-32 h-32" />
-          <div className="h-8 bg-zinc-800 rounded w-64" />
-        </div>
-      </div>
-    );
+    return <ProfileLoadingSkeleton />;
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 min-h-screen   ">
-      <div className="flex justify-center mt-20 ">
+    <div className="max-w-3xl mx-auto p-4 min-h-screen">
+      <div className="flex justify-center mt-20">
         <div className="flex items-center bg-zinc-900 rounded-lg p-1 border border-zinc-800">
           <button
             onClick={() => handleTabChange("profile")}
@@ -256,104 +269,133 @@ export default function ProfilePage() {
           </form>
         </div>
       ) : (
-        <div className="w-full">
-          <h1 className="text-center text-2xl font-bold mt-8 mb-10">
-            Your Favorites
-          </h1>
-
-          {favoritesLoading ? (
+        <Suspense
+          fallback={
             <div className="flex justify-center py-8">
               <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
             </div>
-          ) : favorites.length === 0 ? (
-            <div className="w-full p-6 text-center border border-zinc-800 rounded-lg bg-zinc-900/50">
-              <p className="text-zinc-400 text-sm">
-                You haven't added any favorites yet.
-              </p>
-              <p className="text-zinc-500 text-xs mt-2">
-                When you find posts you like, click the bookmark icon to save
-                them here.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {favorites.map((post) => (
-                <div
-                  key={post.id}
-                  className="bg-black rounded-lg border border-zinc-800 p-3 sm:p-4 shadow-lg hover:border-zinc-600 transition-colors"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0">
-                      {post.authorPhotoURL ? (
-                        <img
-                          src={post.authorPhotoURL}
-                          alt={post.authorName}
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center">
-                          <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                        </div>
-                      )}
+          }
+        >
+          <FavoritesSection />
+        </Suspense>
+      )}
+    </div>
+  );
+}
+
+// Separate component for favorites section
+function FavoritesSection() {
+  const { favorites, loading: favoritesLoading, error } = useFavorites();
+
+  if (favoritesLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full p-6 text-center border border-red-800 rounded-lg bg-red-900/50">
+        <p className="text-red-400 text-sm">Error loading favorites</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <h1 className="text-center text-2xl font-bold mt-8 mb-10">
+        Your Favorites
+      </h1>
+
+      {favorites.length === 0 ? (
+        <div className="w-full p-6 text-center border border-zinc-800 rounded-lg bg-zinc-900/50">
+          <p className="text-zinc-400 text-sm">
+            You haven't added any favorites yet.
+          </p>
+          <p className="text-zinc-500 text-xs mt-2">
+            When you find posts you like, click the bookmark icon to save them
+            here.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {favorites.map((post) => (
+            <div
+              key={post.id}
+              className="bg-black rounded-lg border border-zinc-800 p-3 sm:p-4 shadow-lg hover:border-zinc-600 transition-colors"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  {post.authorPhotoURL ? (
+                    <img
+                      src={post.authorPhotoURL}
+                      alt={post.authorName}
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start gap-2 flex-wrap">
+                    <div className="space-y-1 flex-1 min-w-[200px]">
+                      <div className="flex flex-wrap items-center gap-x-2 text-xs sm:text-sm">
+                        <span className="font-semibold text-white truncate">
+                          {post.authorName}
+                        </span>
+                        <span className="text-zinc-600 hidden xs:inline">
+                          •
+                        </span>
+                        <span className="text-zinc-400 whitespace-nowrap text-xs">
+                          {new Date(post.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
+                        </span>
+                        <span className="text-zinc-600 hidden xs:inline">
+                          •
+                        </span>
+                        <span className="text-indigo-400 truncate text-xs sm:text-sm">
+                          {post.categoryName}
+                        </span>
+                      </div>
+
+                      <h2 className="text-sm sm:text-base font-bold text-white break-words">
+                        {post.title}
+                      </h2>
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start gap-2 flex-wrap">
-                        <div className="space-y-1 flex-1 min-w-[200px]">
-                          <div className="flex flex-wrap items-center gap-x-2 text-xs sm:text-sm">
-                            <span className="font-semibold text-white truncate">
-                              {post.authorName}
-                            </span>
-                            <span className="text-zinc-600 hidden xs:inline">
-                              •
-                            </span>
-                            <span className="text-zinc-400 whitespace-nowrap text-xs">
-                              {new Date(post.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                }
-                              )}
-                            </span>
-                            <span className="text-zinc-600 hidden xs:inline">
-                              •
-                            </span>
-                            <span className="text-indigo-400 truncate text-xs sm:text-sm">
-                              {post.categoryName}
-                            </span>
-                          </div>
-
-                          <h2 className="text-sm sm:text-base font-bold text-white break-words">
-                            {post.title}
-                          </h2>
-                        </div>
-
-                        <div className="flex items-center gap-1 ml-auto sm:ml-0">
-                          <VoteButtons
-                            postId={post.id}
-                            className="scale-90 sm:scale-100"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="pl-0 sm:pl-2">
-                        <div
-                          className="prose prose-invert max-w-none text-zinc-300 text-xs sm:text-sm"
-                          dangerouslySetInnerHTML={{ __html: post.description }}
-                          style={{
-                            wordBreak: "break-word",
-                            overflowWrap: "break-word",
-                          }}
-                        />
-                      </div>
+                    <div className="flex items-center gap-1 ml-auto sm:ml-0">
+                      <VoteButtons
+                        postId={post.id}
+                        className="scale-90 sm:scale-100"
+                      />
                     </div>
                   </div>
+
+                  <div className="pl-0 sm:pl-2">
+                    <div
+                      className="prose prose-invert max-w-none text-zinc-300 text-xs sm:text-sm"
+                      dangerouslySetInnerHTML={{ __html: post.description }}
+                      style={{
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    />
+                  </div>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
+          ))}
         </div>
       )}
     </div>
