@@ -8,7 +8,9 @@ import {
 import { getFirestore } from "firebase-admin/firestore";
 
 const serviceAccount = JSON.parse(
-  process.env.FIREBASE_SERVICE_ACCOUNT!.replace(/\\n/g, "\n")
+  process.env.FIREBASE_SERVICE_ACCOUNT!
+    .replace(/\\n/g, '\n') 
+    .replace(/\\\\/g, '\\') 
 );
 
 const app =
