@@ -9,6 +9,8 @@ interface AnalyticsData {
   referrer: string;
 }
 
+const CACHE_TTL = 60;
+
 export async function getTotalViews(): Promise<number> {
   const snapshot = await adminDb.collection("analytics").count().get();
   return snapshot.data().count;
