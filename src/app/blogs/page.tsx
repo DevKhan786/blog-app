@@ -23,7 +23,27 @@ import { useRouter, useSearchParams } from "next/navigation";
 const TITLE_MAX_LENGTH = 20;
 const DESCRIPTION_MAX_LENGTH = 100;
 
-const BlogsPage = () => {
+// Parent component handling suspense
+export default function BlogsPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <BlogsContent />
+    </Suspense>
+  );
+}
+
+// Loading component
+function LoadingFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+      <Loader2 className="h-10 w-10 animate-spin text-indigo-500 mb-4" />
+      <p className="text-white text-sm">Loading...</p>
+    </div>
+  );
+}
+
+// Main content component with search params
+function BlogsContent() {
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useUserProfile(user);
   const [postContent, setPostContent] = useState({
@@ -38,9 +58,9 @@ const BlogsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<Posts[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCategory = searchParams.get("category");
-  const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
@@ -254,16 +274,11 @@ const BlogsPage = () => {
   };
 
   if (authLoading || dataLoading || profileLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-500 mb-4" />
-        <p className="text-white text-sm">Loading...</p>
-      </div>
-    );
+    return <LoadingFallback />;
   }
 
   return (
-    <div className="text-white w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-0 ">
+    <div className="text-white w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-0">
       <PostForm
         categories={categories}
         isSubmitting={isSubmitting}
@@ -274,18 +289,16 @@ const BlogsPage = () => {
         descriptionMaxLength={DESCRIPTION_MAX_LENGTH}
       />
       <div className="border-b border-zinc-800 my-3" />
-      <Suspense fallback={<div>Loading posts...</div>}>
-        <div className="flex justify-center mb-6">
-          {selectedCategory && (
-            <button
-              onClick={() => router.push("/categories")}
-              className="px-4 py-2 bg-red-500 capitalize cursor-pointer text-white rounded-lg transition-colors"
-            >
-              {selectedCategory && `${selectedCategory}`} - Clear Filter
-            </button>
-          )}
-        </div>
-      </Suspense>
+      <div className="flex justify-center mb-6">
+        {selectedCategory && (
+          <button
+            onClick={() => router.push("/categories")}
+            className="px-4 py-2 bg-red-500 capitalize cursor-pointer text-white rounded-lg transition-colors"
+          >
+            {selectedCategory} - Clear Filter
+          </button>
+        )}
+      </div>
       <PostList
         posts={posts}
         isLoading={!!deletingId}
@@ -295,6 +308,4 @@ const BlogsPage = () => {
       />
     </div>
   );
-};
-
-export default BlogsPage;
+}

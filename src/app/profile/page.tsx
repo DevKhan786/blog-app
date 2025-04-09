@@ -13,7 +13,6 @@ import { updateProfile } from "firebase/auth";
 import toast from "react-hot-toast";
 import VoteButtons from "../../../components/VoteButtons";
 
-// Parent component handling suspense
 export default function ProfilePage() {
   return (
     <Suspense fallback={<ProfileLoadingSkeleton />}>
@@ -22,7 +21,6 @@ export default function ProfilePage() {
   );
 }
 
-// Loading skeleton component
 function ProfileLoadingSkeleton() {
   return (
     <div className="max-w-3xl mx-auto p-4 min-h-screen">
@@ -34,7 +32,6 @@ function ProfileLoadingSkeleton() {
   );
 }
 
-// Main content component with search params
 function ProfileContent() {
   const { user } = useAuth();
   const { profile, loading: profileLoading } = useUserProfile(user);
@@ -46,12 +43,10 @@ function ProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // State derived from search params
   const [activeTab, setActiveTab] = useState<"profile" | "favorites">(() => {
     return searchParams.get("tab") === "favorites" ? "favorites" : "profile";
   });
 
-  // Sync tab state with URL params
   useEffect(() => {
     const tab = searchParams.get("tab");
     setActiveTab(tab === "favorites" ? "favorites" : "profile");
@@ -283,7 +278,6 @@ function ProfileContent() {
   );
 }
 
-// Separate component for favorites section
 function FavoritesSection() {
   const { favorites, loading: favoritesLoading, error } = useFavorites();
 
