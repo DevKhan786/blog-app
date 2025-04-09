@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import {
   addDoc,
@@ -274,16 +274,18 @@ const BlogsPage = () => {
         descriptionMaxLength={DESCRIPTION_MAX_LENGTH}
       />
       <div className="border-b border-zinc-800 my-3" />
-      <div className="flex justify-center mb-6">
-        {selectedCategory && (
-          <button
-            onClick={() => router.push("/categories")}
-            className="px-4 py-2 bg-red-500 capitalize cursor-pointer text-white rounded-lg transition-colors"
-          >
-            {selectedCategory && `${selectedCategory}`} - Clear Filter
-          </button>
-        )}
-      </div>
+      <Suspense fallback={<div>Loading posts...</div>}>
+        <div className="flex justify-center mb-6">
+          {selectedCategory && (
+            <button
+              onClick={() => router.push("/categories")}
+              className="px-4 py-2 bg-red-500 capitalize cursor-pointer text-white rounded-lg transition-colors"
+            >
+              {selectedCategory && `${selectedCategory}`} - Clear Filter
+            </button>
+          )}
+        </div>
+      </Suspense>
       <PostList
         posts={posts}
         isLoading={!!deletingId}
