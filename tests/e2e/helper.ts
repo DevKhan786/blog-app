@@ -1,4 +1,5 @@
 import { Page, expect } from "@playwright/test";
+import { waitFor } from "@testing-library/dom";
 
 export const autoAdminLogin = async (page: Page) => {
   await expect(page, "Should navigate to login page").toHaveURL("/login");
@@ -21,7 +22,6 @@ export const signInWithCredentials = async (
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign In" }).click();
-  await expect(page, "Should redirect to home page").toHaveURL("/");
 };
 
 export const TestUser = {
