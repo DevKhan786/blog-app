@@ -10,16 +10,35 @@ import * as fs from "fs";
 import * as path from "path";
 
 let serviceAccount;
-try {
-  const filePath = path.join(process.cwd(), "firebase-service-account.json");
-  const fileContent = fs.readFileSync(filePath, "utf8");
-  serviceAccount = JSON.parse(fileContent);
-} catch (error) {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+
+if (process.env.CI === "true" && process.env.FIREBASE_SERVICE_ACCOUNT) {
+  try {
     serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  } else {
-    console.error("Firebase service account not found:", error);
-    throw new Error("Firebase service account not found");
+  } catch (error) {
+    console.error(
+      "Failed to parse FIREBASE_SERVICE_ACCOUNT environment variable:",
+      error
+    );
+    throw new Error("Invalid Firebase service account in environment variable");
+  }
+} else {
+  try {
+    const filePath = path.join(process.cwd(), "firebase-service-account.json");
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    serviceAccount = JSON.parse(fileContent);
+  } catch (error) {
+    console.error("Firebase service account file not found:", error);
+
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      try {
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      } catch (parseError) {
+        console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT:", parseError);
+        throw new Error("Firebase service account not available");
+      }
+    } else {
+      throw new Error("Firebase service account not found");
+    }
   }
 }
 
