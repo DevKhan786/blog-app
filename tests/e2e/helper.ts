@@ -1,16 +1,16 @@
 import { Page, expect } from "@playwright/test";
 
 export const autoAdminLogin = async (page: Page) => {
-  await expect(page).toHaveURL("/login");
+  await expect(page, "Should navigate to login page").toHaveURL("/login");
   await page.getByRole("button", { name: "Auto-fill" }).click();
   await page.getByRole("button", { name: "Sign In" }).click();
-  await expect(page).toHaveURL("/");
+  await expect(page, "Should redirect to home page").toHaveURL("/");
   await expect(page.getByText("test123@gmail.com").first()).toBeVisible();
 };
 
 export const logout = async (page: Page) => {
   await page.getByRole("button", { name: /logout/i }).click();
-  await expect(page).toHaveURL("/");
+  await expect(page, "Should redirect to home page").toHaveURL("/");
 };
 
 export const signInWithCredentials = async (
@@ -20,7 +20,11 @@ export const signInWithCredentials = async (
 ) => {
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
-  await page.getByRole("button", { name: "Sign In" }).click();
+  await Promise.all([
+    page.waitForURL("/"), 
+    page.getByRole("button").click(), 
+  ]);
+  await expect(page, "Should redirect to home page").toHaveURL("/");
 };
 
 export const TestUser = {

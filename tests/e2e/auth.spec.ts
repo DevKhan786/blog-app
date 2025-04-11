@@ -7,13 +7,23 @@ import {
 } from "./helper";
 
 test.describe("Authentication Flow", () => {
-  
   test.beforeEach(async ({ page }) => {
     await page.goto("/login");
   });
 
-  test("should login with valid credentials", async ({ page }) => {
+  test("should login with admin credentials automatically", async ({
+    page,
+  }) => {
     await autoAdminLogin(page);
+  });
+
+  test("should login with admin credentials manually", async ({ page }) => {
+    await signInWithCredentials(
+      page,
+      TestUser.admin.email,
+      TestUser.admin.password
+    );
+    await expect(page.getByText("test123@gmail.com").first()).toBeVisible();
   });
 
   test("should handle invalid login", async ({ page }) => {
