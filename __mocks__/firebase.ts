@@ -13,3 +13,8 @@ export const mockAuth = {
 
 export const getAuth = jest.fn(() => mockAuth);
 export const GoogleAuthProvider = jest.fn();
+
+export const mockHandleEmailPasswordAuth = jest.fn();
+export const mockHandleResetPassword = jest.fn();
+export const mockClearError = jest.fn();
+export const mockHandleSignInWithGoogle = jest.fn();
