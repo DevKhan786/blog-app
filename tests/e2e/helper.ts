@@ -13,7 +13,6 @@ export const logout = async (page: Page) => {
   await expect(page, "Should redirect to home page").toHaveURL("/");
 };
 
-
 export const signInWithCredentials = async (
   page: Page,
   email: string,
@@ -21,11 +20,8 @@ export const signInWithCredentials = async (
 ) => {
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
-  await Promise.all([
-    page.waitForURL("/"), 
-    page.getByRole("button").click(), 
-  ]);
-  await expect(page, "Should redirect to home page.").toHaveURL("/");
+  await page.getByRole("button", { name: "Sign In" }).click();
+  await expect(page, "Should redirect to home page").toHaveURL("/");
 };
 
 export const TestUser = {
