@@ -7,7 +7,6 @@ on:
 
 env:
   BASE_URL: http://localhost:3000
-  NODE_ENV: test
   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: dcgu2nrsr
   NEXT_PUBLIC_ADMIN_EMAIL: test123@gmail.com
 
