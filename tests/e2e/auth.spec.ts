@@ -1,43 +1,40 @@
+// tests/auth.spec.ts
 import { test, expect } from "@playwright/test";
-import {
-  autoAdminLogin,
-  logout,
-  signInWithCredentials,
-  TestUser,
-} from "./helper";
+import { AuthPage } from "../pages/AuthPage";
+import { TestUser } from "../config/test-data";
 
 test.describe("Authentication Flow", () => {
+  let authPage: AuthPage;
+
   test.beforeEach(async ({ page }) => {
-    await page.goto("/login");
+    authPage = new AuthPage(page);
+    await authPage.navigateToLogin();
   });
 
-  test("should login with admin credentials automatically", async ({
-    page,
-  }) => {
-    await autoAdminLogin(page);
+  test("should login with admin credentials automatically", async () => {
+    await authPage.autoAdminLogin();
+    await authPage.assertSuccessfulLogin();
   });
 
-  test("should login with admin credentials manually", async ({ page }) => {
-    await signInWithCredentials(
-      page,
+  test("should login with admin credentials manually", async () => {
+    await authPage.signInWithCredentials(
       TestUser.admin.email,
       TestUser.admin.password
     );
-    await expect(page.getByText("test123@gmail.com").first()).toBeVisible();
+    await authPage.assertSuccessfulLogin();
   });
 
-  test("should handle invalid login", async ({ page }) => {
-    await signInWithCredentials(
-      page,
+  test("should handle invalid login", async () => {
+    await authPage.signInWithCredentials(
       TestUser.invalid.email,
       TestUser.invalid.password
     );
-    await expect(page.getByText(/login failed/i)).toBeVisible();
+    await authPage.assertLoginError(/login failed/i);
   });
 
-  test("should logout", async ({ page }) => {
-    await autoAdminLogin(page);
-    await logout(page);
-    await expect(page.getByText("test123@gmail.com").first()).not.toBeVisible();
+  test("should logout successfully", async () => {
+    await authPage.autoAdminLogin();
+    await authPage.logout();
+    await authPage.assertSuccessfulLogout();
   });
 });
