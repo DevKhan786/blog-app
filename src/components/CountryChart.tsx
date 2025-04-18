@@ -15,17 +15,17 @@ export function CountryChart({
 }) {
   return (
     <div className="h-[300px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="80%" height="100%">
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 20, right: 10, left: 30, bottom: 20 }}
+          margin={{ top: 20, right: 10, left: -20, bottom: 50 }}
         >
           <XAxis type="number" tick={{ fill: "#9ca3af", fontSize: 12 }} />
           <YAxis
             dataKey="country"
             type="category"
-            tick={{ fill: "#9ca3af", fontSize: 12 }}
+            tick={{ fill: "#9ca3af", fontSize: 8 }}
             width={80}
           />
           <Tooltip
@@ -37,7 +37,7 @@ export function CountryChart({
             }}
             itemStyle={{ color: "#f8fafc" }}
             formatter={(value) => [
-              <span key="value" className="text-blue-300">
+              <span key="value" className="text-blue-300 ">
                 {value} visitors
               </span>,
               "Count",

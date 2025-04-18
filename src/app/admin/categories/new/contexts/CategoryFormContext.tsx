@@ -44,7 +44,6 @@ export default function CategoryFormProvider({
   };
 
   const handleData = (key: keyof Category, value: any) => {
-    // Clear notifications when user starts editing again
     if (error || success) {
       clearNotifications();
     }
@@ -64,11 +63,9 @@ export default function CategoryFormProvider({
         throw new Error("Please select an image");
       }
 
-      // Create form data for the API
       const formData = new FormData();
       formData.append("file", image);
 
-      // Upload to our API route (which then uploads to Cloudinary)
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: formData,

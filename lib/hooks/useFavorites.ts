@@ -20,7 +20,6 @@ export const useFavorites = () => {
   const [error, setError] = useState<string | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
 
-  // Listen for changes to the user's favorite IDs
   useEffect(() => {
     if (!user) {
       setFavorites([]);
@@ -83,7 +82,7 @@ export const useFavorites = () => {
               categoryId: data.categoryId || "",
               categoryName: data.categoryName || "",
               categorySlug: data.categorySlug || "",
-              authorId: data.authorId || "",
+              authorId: data.authorId || "unknown",
               authorName: data.authorName || "Anonymous",
               authorEmail: data.authorEmail || null,
               authorPhotoURL: data.authorPhotoURL || null,

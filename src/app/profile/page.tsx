@@ -251,7 +251,7 @@ function ProfileContent() {
 
             <Button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 cursor-pointer"
               disabled={updateLoading || !displayName.trim()}
               aria-label="Update profile"
             >
@@ -372,11 +372,14 @@ function FavoritesSection() {
                       <VoteButtons
                         postId={post.id}
                         className="scale-90 sm:scale-100"
+                        post={post}
+                        isDeleting={false}
+                        showFavorite={true}
                       />
                     </div>
                   </div>
 
-                  <div className="pl-0 sm:pl-2">
+                  <div className="pl-0 ">
                     <div
                       className="prose prose-invert max-w-none text-zinc-300 text-xs sm:text-sm"
                       dangerouslySetInnerHTML={{ __html: post.description }}

@@ -34,7 +34,7 @@ export function PagesPieChart({
         <Pie
           data={data}
           cx="50%"
-          cy="50%"
+          cy={isMobile ? "40%" : "50%"}
           innerRadius={60}
           outerRadius={80}
           paddingAngle={2}
@@ -67,7 +67,9 @@ export function PagesPieChart({
           wrapperStyle={{
             color: "#f3f4f6",
             padding: isMobile ? "10px 0 0 0" : "0 0 0 20px",
+            fontSize: isMobile ? "10px" : "12px",
           }}
+          iconSize={isMobile ? 10 : 14}
         />
       </PieChart>
     </ResponsiveContainer>

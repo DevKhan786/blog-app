@@ -84,41 +84,41 @@ const MenuBar: React.FC<MenuBarProps> = ({
 
   const formattingOptions = [
     {
-      icon: <Bold className="h-4 w-4" />,
+      icon: <Bold className="h-2 w-2" />,
       command: "toggleBold" as const,
       isActive: editor.isActive("bold"),
     },
     {
-      icon: <Italic className="h-4 w-4" />,
+      icon: <Italic className="h-2 w-2" />,
       command: "toggleItalic" as const,
       isActive: editor.isActive("italic"),
     },
     {
-      icon: <Heading1 className="h-4 w-4" />,
+      icon: <Heading1 className="h-2 w-2" />,
       command: "toggleHeading" as const,
       args: [{ level: 1 as const }],
       isActive: editor.isActive("heading", { level: 1 }),
     },
     {
-      icon: <List className="h-4 w-4" />,
+      icon: <List className="h-2 w-2" />,
       command: "toggleBulletList" as const,
       isActive: editor.isActive("bulletList"),
     },
     {
-      icon: <ListOrdered className="h-4 w-4" />,
+      icon: <ListOrdered className="h-2 w-2" />,
       command: "toggleOrderedList" as const,
       isActive: editor.isActive("orderedList"),
     },
     {
-      icon: <Strikethrough className="h-4 w-4" />,
+      icon: <Strikethrough className="h-2 w-2" />,
       command: "toggleStrike" as const,
       isActive: editor.isActive("strike"),
     },
   ];
 
   return (
-    <div className="flex flex-wrap justify-between items-center p-1 border rounded-t-lg bg-black border-zinc-700 gap-1">
-      <div className="flex flex-wrap gap-1">
+    <div className="flex justify-between items-center  border rounded-t-lg bg-black border-zinc-700 gap-1  flex-wrap sm:flex-nowrap  px-2 py-2 ">
+      <div className="flex justify-between md:mr-2   w-full bg-neutral-500/20 rounded-sm p-1.5 h-8 items-center   ">
         {formattingOptions.map((option, index) => (
           <Toggle
             key={index}
@@ -133,7 +133,7 @@ const MenuBar: React.FC<MenuBarProps> = ({
               }
               chain.run();
             }}
-            className="cursor-pointer data-[state=on]:bg-indigo-600 hover:bg-zinc-700 text-white h-7 w-7 p-1.5"
+            className="cursor-pointer data-[state=on]:bg-indigo-600  text-white h-1 w-1 sm:h-4 sm:w-2 p-1.5"
             disabled={isDisabled}
           >
             {option.icon}
@@ -143,10 +143,10 @@ const MenuBar: React.FC<MenuBarProps> = ({
           size="sm"
           pressed={false}
           onPressedChange={handleAddImage}
-          className="cursor-pointer hover:bg-zinc-700 text-white h-7 w-7 p-1.5"
+          className="cursor-pointer  sm:h-4 sm:w-2 text-white h-1 w-1 p-1.5"
           disabled={isDisabled}
         >
-          <ImageIcon className="h-4 w-4" />
+          <ImageIcon />
         </Toggle>
       </div>
 
@@ -159,9 +159,9 @@ const MenuBar: React.FC<MenuBarProps> = ({
       />
 
       <Button
-        className={`cursor-pointer h-7 px-3 text-sm ${
+        className={`rounded-sm cursor-pointer sm:max-w-[10%] h-8 flex w-full mt-1 sm:mt-0  text-sm ${
           user
-            ? "bg-white text-black hover:bg-indigo-100"
+            ? "bg-white text-black hover:bg-black border hover:text-white"
             : "bg-zinc-800 cursor-not-allowed"
         }`}
         variant="ghost"

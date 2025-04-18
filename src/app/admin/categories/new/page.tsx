@@ -24,7 +24,6 @@ const CategoryFormPage = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-dismiss success message after 5 seconds
   useEffect(() => {
     let timer: number;
     if (success) {
@@ -52,7 +51,7 @@ const CategoryFormPage = () => {
   };
 
   return (
-    <div className="flex flex-col w-full items-center min-h-screen p-4 md:p-6 bg-black">
+    <div className="flex flex-col w-full items-center min-h-screen p-4 md:p-6 ">
       <Link
         href="/admin/categories"
         className=" px-8 hover:bg-indigo-600 duration-300 transition-all bg-red-500 py-2 mb-8 rounded-2xl"

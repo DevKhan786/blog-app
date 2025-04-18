@@ -20,14 +20,9 @@ const EditCategoryPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [category, setCategory] = useState<CategoryWithId | null>(null);
-
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-  });
+  const [formData, setFormData] = useState({ name: "", slug: "" });
   const [image, setImage] = useState<File | null>(null);
   const [changeImage, setChangeImage] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +33,6 @@ const EditCategoryPage = () => {
       try {
         setIsLoading(true);
         const categorySnapshot = await getDoc(categoryRef);
-
         if (categorySnapshot.exists()) {
           const data = categorySnapshot.data();
           const categoryData = {
@@ -47,34 +41,23 @@ const EditCategoryPage = () => {
             slug: data.slug || "",
             imageUrl: data.imageUrl || "",
             createdAt: data.createdAt,
-          } as CategoryWithId;
-
+          };
           setCategory(categoryData);
-          setFormData({
-            name: categoryData.name,
-            slug: categoryData.slug,
-          });
-        } else {
-          setError("Category not found");
-        }
+          setFormData({ name: categoryData.name, slug: categoryData.slug });
+        } else setError("Category not found");
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
         setError(errorMessage);
-        console.error(errorMessage);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchCategory();
   }, [categoryId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,265 +66,210 @@ const EditCategoryPage = () => {
     setChangeImage(true);
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  const removeImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setImage(null);
-  };
-
   const updateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
     setLoading(true);
-
     try {
       let imageUrl = category?.imageUrl;
-
       if (changeImage && image) {
         const formData = new FormData();
         formData.append("file", image);
-
         const uploadResponse = await fetch("/api/upload", {
           method: "POST",
           body: formData,
         });
-
-        if (!uploadResponse.ok) {
-          const errorData = await uploadResponse.json();
-          throw new Error(errorData.error || "Failed to upload image");
-        }
-
+        if (!uploadResponse.ok) throw new Error("Failed to upload image");
         const imageData = await uploadResponse.json();
         imageUrl = imageData.imageUrl;
       }
-
       await updateDoc(categoryRef, {
         name: formData.name,
         slug: formData.slug,
         ...(imageUrl !== category?.imageUrl ? { imageUrl } : {}),
         updatedAt: new Date().toISOString(),
       });
-
-      setSuccess(`Category "${formData.name}" has been updated!`);
-
-      setTimeout(() => {
-        router.push("/admin/categories");
-      }, 2000);
+      setSuccess(`Category "${formData.name}" updated!`);
+      setTimeout(() => router.push("/admin/categories"), 2000);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       setError(errorMessage);
-      console.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  if (isLoading) {
+  if (isLoading)
     return (
-      <div className="flex justify-center items-center min-h-screen bg-black">
-        <div className="h-16 w-16 animate-spin text-indigo-500">
-          <Loader2 className="h-full w-full" />
-        </div>
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-16 w-16 animate-spin text-indigo-500" />
       </div>
     );
-  }
 
-  if (error && !category) {
+  if (error && !category)
     return (
-      <div className="container mx-auto p-4 bg-black text-white">
+      <div className="container mx-auto p-4 text-white">
         <Alert
           variant="destructive"
-          className="mb-4 bg-red-900/30 border border-red-700 text-red-200"
+          className="mb-4 bg-red-900/30 border-red-700"
         >
           <AlertDescription>{error}</AlertDescription>
         </Alert>
         <Link href="/admin/categories">
-          <Button className="hoverEffect">Back to Categories</Button>
+          <Button className="hover:bg-indigo-700 transition-colors">
+            Back to Categories
+          </Button>
         </Link>
       </div>
     );
-  }
 
   return (
-    <div className="flex flex-col w-full items-center min-h-screen p-4 md:p-6 bg-black">
-       <Link
+    <div className="flex flex-col w-full items-center min-h-screen p-4 sm:p-6">
+      <Link
         href="/admin/categories"
-        className=" px-8 hover:bg-indigo-600 duration-300 transition-all bg-red-500 py-2 mb-8 rounded-2xl"
+        className="w-full max-w-xs sm:max-w-md mb-6 sm:mb-8"
       >
-        Back
+        <Button
+          className="w-full bg-indigo-600 hover:bg-indigo-700 transition-colors cursor-pointer"
+          size="sm"
+        >
+          Back to Categories
+        </Button>
       </Link>
-      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-lg shadow-md p-6 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-bold mt-2 mb-6 text-center text-white">
+
+      <div className="w-full max-w-xs sm:max-w-md bg-zinc-900 border-zinc-800 rounded-lg shadow-md p-4 sm:p-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center text-white">
           Edit Category
         </h1>
 
         {error && (
           <Alert
             variant="destructive"
-            className="mb-6 bg-red-900/30 border border-red-700 text-red-200"
+            className="mb-4 bg-red-900/30 border-red-700"
           >
             <AlertDescription className="text-sm">{error}</AlertDescription>
           </Alert>
         )}
 
         {success && (
-          <Alert className="mb-6 bg-indigo-900/30 border border-indigo-700 text-indigo-200">
+          <Alert className="mb-4 bg-indigo-900/30 border-indigo-700">
             <AlertDescription className="text-sm">{success}</AlertDescription>
           </Alert>
         )}
 
-        <form onSubmit={updateCategory} className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className="text-sm font-medium text-gray-300">
-              Category Name
-            </Label>
+        <form onSubmit={updateCategory} className="flex flex-col gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-gray-300">Category Name</Label>
             <Input
-              placeholder="Enter category name"
-              id="name"
               name="name"
-              type="text"
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:ring-indigo-500"
+              className="bg-zinc-800 border-zinc-700 focus:border-indigo-500"
               required
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="slug" className="text-sm font-medium text-gray-300">
-              Category Slug
-            </Label>
+          <div className="space-y-2">
+            <Label className="text-sm text-gray-300">Category Slug</Label>
             <Input
-              placeholder="enter-category-slug"
-              id="slug"
               name="slug"
-              type="text"
               value={formData.slug}
               onChange={handleChange}
-              className="mt-1 bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:ring-indigo-500"
+              className="bg-zinc-800 border-zinc-700 focus:border-indigo-500"
               required
             />
-            <p className="text-xs text-gray-400 mt-1">
-              Used in URLs, lowercase with hyphens instead of spaces
+            <p className="text-xs text-gray-400">
+              Use lowercase with hyphens (e.g., "category-name")
             </p>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="image"
-              className="text-sm font-medium text-gray-300"
-            >
-              Category Image
-            </Label>
-            <div className="mt-1">
-              <input
-                ref={fileInputRef}
-                type="file"
-                id="image"
-                name="image"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
+          <div className="space-y-2">
+            <Label className="text-sm text-gray-300">Category Image</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
 
-              {!changeImage && category?.imageUrl ? (
-                <div className="mb-2">
-                  <p className="text-sm text-gray-400 mb-2">Current image:</p>
-                  <div className="relative h-40 w-full bg-zinc-800 rounded-md overflow-hidden">
+            {!changeImage && category?.imageUrl ? (
+              <div className="space-y-2">
+                <div className="relative h-32 sm:h-40 bg-zinc-800 rounded-md overflow-hidden">
+                  <Image
+                    src={category.imageUrl}
+                    alt={category.name}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => setChangeImage(true)}
+                  className="w-full bg-zinc-800 hover:bg-zinc-700 transition-colors cursor-pointer"
+                >
+                  Change Image
+                </Button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className={`relative h-32 sm:h-40 rounded-md border-2 border-dashed ${
+                  image
+                    ? "border-indigo-600"
+                    : "border-zinc-700 hover:border-indigo-500"
+                } transition-colors cursor-pointer bg-zinc-800`}
+              >
+                {image ? (
+                  <>
                     <Image
-                      src={category.imageUrl}
-                      alt={category.name}
+                      src={URL.createObjectURL(image)}
+                      alt="Preview"
                       fill
                       className="object-contain"
                     />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setImage(null);
+                      }}
+                      className="absolute top-2 right-2 bg-zinc-800 rounded-full p-1 hover:bg-zinc-700 transition-colors"
+                    >
+                      <X className="h-4 w-4 text-white" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                    <ImagePlus className="h-8 w-8 mb-2" />
+                    <span className="text-sm">Click to upload image</span>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="cursor-pointer mt-2 w-full bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700"
-                    onClick={() => setChangeImage(true)}
-                  >
-                    Change Image
-                  </Button>
-                </div>
-              ) : (
-                <div
-                  onClick={triggerFileInput}
-                  className={`relative w-full h-40 sm:h-48 rounded-md overflow-hidden border-2 border-dashed transition-all cursor-pointer ${
-                    image
-                      ? "border-indigo-600 bg-transparent"
-                      : "border-zinc-700 bg-zinc-800 hover:border-indigo-500"
-                  }`}
-                >
-                  {image ? (
-                    <>
-                      <Image
-                        src={URL.createObjectURL(image)}
-                        alt="Category preview"
-                        fill
-                        className="object-contain"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="absolute top-2 right-2 bg-zinc-800 rounded-full p-1 shadow-md hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
-                        aria-label="Remove image"
-                      >
-                        <X size={16} className="text-white" />
-                      </button>
-                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-2 truncate">
-                        {image.name}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center">
-                      <ImagePlus size={32} className="text-gray-400 mb-2" />
-                      <span className="text-gray-300 text-sm">
-                        Click to select a new image
-                      </span>
-                      <span className="text-gray-400 text-xs mt-1">
-                        JPG, PNG, WebP formats
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
 
-          <div className="flex gap-3 mt-2">
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
             <Link href="/admin/categories" className="flex-1">
               <Button
                 type="button"
                 variant="outline"
-                className="cursor-pointer w-full bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700"
+                className="w-full bg-zinc-800 hover:bg-zinc-700 transition-colors cursor-pointer"
               >
                 Cancel
               </Button>
             </Link>
             <Button
               type="submit"
-              className="cursor-pointer flex-1 hoverEffect"
-              disabled={
-                loading ||
-                !formData.name ||
-                !formData.slug ||
-                (changeImage && !image)
-              }
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700 transition-colors cursor-pointer"
+              disabled={loading || !formData.name || !formData.slug}
             >
               {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                "Update Category"
-              )}
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
+              {loading ? "Updating..." : "Update Category"}
             </Button>
           </div>
         </form>
